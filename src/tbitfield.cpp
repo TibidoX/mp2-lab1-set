@@ -6,6 +6,7 @@
 // Битовое поле
 
 #include "tbitfield.h"
+#include <iostream>
 
 // Fake variables used as placeholders in tests
 static const int FAKE_INT = -1;
@@ -53,7 +54,7 @@ TELEM TBitField::GetMemMask(const int n) const // битовая маска дл
 
 int TBitField::GetLength(void) const // получить длину (к-во битов)
 {
-  return FAKE_INT;
+  return BitLen;
 }
 
 void TBitField::SetBit(const int n) // установить бит
@@ -81,17 +82,43 @@ int TBitField::GetBit(const int n) const // получить значение б
 
 TBitField& TBitField::operator=(const TBitField &bf) // присваивание
 {
-    return FAKE_BITFIELD;
+    if (&bf == this)
+        return *this;
+    if (MemLen != bf.MemLen)
+    {
+        MemLen = bf.MemLen;
+        delete[] pMem;
+        pMem = new TELEM[MemLen];
+    }
+    for (int i = 0; i < MemLen; i++)
+        pMem[i] = bf.pMem[i];
+    return *this;
 }
 
 int TBitField::operator==(const TBitField &bf) const // сравнение
 {
-  return FAKE_INT;
+    if (BitLen != bf.BitLen)
+        return 0;
+    int res = 1;
+    for (int i = 0; i < MemLen; i++)
+    {
+        if (pMem[i] != bf.pMem[i])
+            res = 0;
+    }
+    return res;
 }
 
 int TBitField::operator!=(const TBitField &bf) const // сравнение
 {
-  return FAKE_INT;
+    if (BitLen == bf.BitLen)
+        return 0;
+    int res = 1;
+    for (int i = 0; i < MemLen; i++)
+    {
+        if (pMem[i] == bf.pMem[i])
+            res = 0;
+    }
+    return res;
 }
 
 TBitField TBitField::operator|(const TBitField &bf) // операция "или"
