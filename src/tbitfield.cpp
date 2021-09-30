@@ -14,6 +14,8 @@ static TBitField FAKE_BITFIELD(1);
 
 TBitField::TBitField(int len)
 {
+    if (len < 0)
+        throw len;
     BitLen = len;
     MemLen = (BitLen - 1) / 32 + 1;
     pMem = new TELEM[MemLen];
@@ -84,6 +86,7 @@ TBitField& TBitField::operator=(const TBitField &bf) // присваивание
 {
     if (&bf == this)
         return *this;
+    BitLen = bf.BitLen;
     if (MemLen != bf.MemLen)
     {
         MemLen = bf.MemLen;
@@ -110,8 +113,8 @@ int TBitField::operator==(const TBitField &bf) const // сравнение
 
 int TBitField::operator!=(const TBitField &bf) const // сравнение
 {
-    if (BitLen == bf.BitLen)
-        return 0;
+    if (BitLen != bf.BitLen)
+        return 1;
     int res = 1;
     for (int i = 0; i < MemLen; i++)
     {
