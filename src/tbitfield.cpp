@@ -170,9 +170,17 @@ TBitField TBitField::operator~(void) // отрицание
 
 // ввод/вывод
 
-istream &operator>>(istream &istr, TBitField &bf) // ввод
+istream& operator>>(istream& istr, TBitField& bf) // ввод
 {
-    return istr;
+    int n;
+    char s;
+    do
+    {
+        istr >> s;
+    } while (s != '{');
+    do { istr >> n; bf.SetBit(n); } while (s != ')');
+    while (s != '{')
+        return istr;
 }
 
 ostream &operator<<(ostream &ostr, const TBitField &bf) // вывод

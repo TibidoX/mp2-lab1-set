@@ -26,7 +26,7 @@ TSet::TSet(const TSet &s) : BitField(s.BitField)
 // конструктор преобразования типа
 TSet::TSet(const TBitField &bf) : BitField(bf)
 {
-
+    MaxPower = bf.GetLength();
 }
 
 TSet::operator TBitField()
@@ -36,12 +36,12 @@ TSet::operator TBitField()
 
 int TSet::GetMaxPower(void) const // получить макс. к-во эл-тов
 {
-    return FAKE_INT;
+    return MaxPower;
 }
 
 int TSet::IsMember(const int Elem) const // элемент множества?
 {
-    return FAKE_INT;
+    return BitField.GetBit(Elem);
 }
 
 void TSet::InsElem(const int Elem) // включение элемента множества
@@ -58,7 +58,11 @@ void TSet::DelElem(const int Elem) // исключение элемента мн
 
 TSet& TSet::operator=(const TSet &s) // присваивание
 {
-    return FAKE_SET;
+    if (&s == this)
+        return *this;
+    MaxPower = s.MaxPower;
+    BitField = s.BitField;
+    return *this;
 }
 
 int TSet::operator==(const TSet &s) const // сравнение
@@ -68,7 +72,7 @@ int TSet::operator==(const TSet &s) const // сравнение
 
 int TSet::operator!=(const TSet &s) const // сравнение
 {
-    return FAKE_INT;
+    return (s.BitField != BitField);
 }
 
 TSet TSet::operator+(const TSet &s) // объединение
@@ -78,12 +82,14 @@ TSet TSet::operator+(const TSet &s) // объединение
 
 TSet TSet::operator+(const int Elem) // объединение с элементом
 {
-    return FAKE_SET;
+    BitField.SetBit(Elem);
+    return (BitField);
 }
 
 TSet TSet::operator-(const int Elem) // разность с элементом
 {
-    return FAKE_SET;
+    BitField.ClrBit(Elem);
+    return (BitField);
 }
 
 TSet TSet::operator*(const TSet &s) // пересечение
@@ -93,7 +99,7 @@ TSet TSet::operator*(const TSet &s) // пересечение
 
 TSet TSet::operator~(void) // дополнение
 {
-    return FAKE_SET;
+    return (~BitField);
 }
 
 // перегрузка ввода/вывода
@@ -113,11 +119,16 @@ istream &operator>>(istream &istr, TSet &set) // ввод
         return istr;
 }
 
-ostream& operator<<(ostream &ostr, const TSet &s) // вывод
+ostream& operator<<(ostream& ostr, const TSet& s) // вывод
 {
+    int i = 0;
     ostr << "{";
-    for (int i = 0; i < s.GetMaxPower(); i++)
+    while (!s.IsMember(i))
+        i++;
+    ostr << i;
+    for (++i; i < s.GetMaxPower(); i++)
         if (s.IsMember(i))
-            ostr << i << ",";
+            ostr << "," << i;
+    ostr << "}";
     return ostr;
 }
